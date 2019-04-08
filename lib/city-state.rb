@@ -113,7 +113,7 @@ module CS
     # we don't have used this method yet: discover by the file extension
     fn = Dir[File.join(FILES_FOLDER, "cities.*")].last
     @current_country = fn.blank? ? nil : fn.split(".").last
-    
+
     # there's no files: we'll install and use :US
     if @current_country.blank?
       @current_country = :US
@@ -121,7 +121,7 @@ module CS
 
     # we find a file: normalize the extension to something like :US
     else
-      @current_country = @current_country.to_s.upcase.to_sym    
+      @current_country = @current_country.to_s.upcase.to_sym
     end
 
     @current_country
@@ -131,7 +131,7 @@ module CS
     @current_country = country.to_s.upcase.to_sym
   end
 
-  def self.cities(state, country = nil)
+  def self.cities(state: nil, country: nil)
     self.current_country = country if country.present? # set as current_country
     country = self.current_country
 
@@ -142,7 +142,8 @@ module CS
       @cities[country] = YAML::load_file(cities_fn).symbolize_keys
     end
 
-    @cities[country][state.to_s.upcase.to_sym] || []
+    cities = @cities[country]
+    Array(state.present? ? cities[state.to_s.upcase.to_sym] : cities.to_h.values.flatten.sort)
   end
 
   def self.states(country)
