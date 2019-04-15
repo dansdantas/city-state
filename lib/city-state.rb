@@ -131,19 +131,29 @@ module CS
     @current_country = country.to_s.upcase.to_sym
   end
 
-  def self.cities(state, country = nil)
+  def self.cities(state: nil, country: nil)
     self.current_country = country if country.present? # set as current_country
     country = self.current_country
 
-    # load the country file
-    if @cities[country].blank?
-      cities_fn = File.join(FILES_FOLDER, "cities.#{country.to_s.downcase}")
-      self.install(country) if ! File.exists? cities_fn
-      @cities[country] = YAML::load_file(cities_fn).symbolize_keys
-    end
+    cities = get_country_cities(country)[country]
 
-    @cities[country][state.to_s.upcase.to_sym] || []
+    if state.present?
+      cities[state.to_s.upcase.to_sym] || []
+    else
+      cities.values.flatten.uniq
+    end
   end
+
+  def self.get_country_cities(country)
+    return @cities[country] unless  @cities[country].blank?
+
+    cities_fn = File.join(FILES_FOLDER, "cities.#{country.to_s.downcase}")
+    self.install(country) if ! File.exists? cities_fn
+    @cities[country] = YAML::load_file(cities_fn).symbolize_keys
+    @cities
+  end
+
+  private_class_method :get_country_cities
 
   def self.states(country)
     self.current_country = country # set as current_country
