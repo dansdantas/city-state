@@ -55,7 +55,7 @@ CS.update
 
 When getting a city list, you can also specifies the country:
 ```ruby
-CS.cities(:sp, :br)
+CS.cities(state: :sp,country: :br)
 ```
 
 The country is an optional argument. **city-state** always uses the last country that you used.
